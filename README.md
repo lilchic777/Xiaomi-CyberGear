@@ -3,21 +3,33 @@
 Debugging and inverse kinematics program for Xiaomi CyberGear robotic arm. Thanks to @Tony607 and @freezeLUO
 for the open-source code.
 
-## Purpose of each Python file
+## Key features
 
-pcan-cybergear.py: Multi-mode motor controller based on CAN bus, supporting four modes: position/speed/current/motion control;<br/>
+### Low-level tool files
 
-pcan-robotic-1axis.py: Debugging program for a single micro motor;<br/>
+`pcan-cybergear.py`: Multi-mode motor controller based on CAN bus, supporting four modes: position/speed/current/motion control;
 
-pcan-robotic-2axis.py: Debugging program for two micro motors simultaneously, which can be extended to control multiple axes simultaneously arm;<br/>
+`tools.py`: Python files stored in ESP32 provide various operations for controlling motors via CAN bus (including setting operating modes, positions, speeds, currents, and other parameters to achieve position control, start/stop, and communication).
+
+### Debugging motor files
+
+`pcan-robotic-1axis.py`: Debugging program for a single micro motor;
+
+`pcan-robotic-2axis.py`: Debugging program for two micro motors simultaneously, which can be extended to control multiple axes simultaneously arm;
 
 > [!NOTE]
 >
 > When controlling multiple motors simultaneously, you need to use Xiaomi's official CyberGear debugger to set different CAN IDs for the motors.
 
-inverseKinematics.py: 4-degree-of-freedom robotic arm inverse kinematics: Given the corresponding coordinates (X, Y, Z) and pitch angle, calculate the rotation angle of each joint; only solves for the data corresponding to the given set of coordinates and pitch angle; returns False if no solution is found;<br/>
+### Inverse kinematics calculation and control
 
-armMoveIK.py: Imports inverseKinematics, solves within the pitch angle range, and returns either the endpoint of the interval or reference data within the interval; returns False if no solution is found.
+`inverseKinematics.py`: 4-degree-of-freedom robotic arm inverse kinematics: Given the corresponding coordinates (X, Y, Z) and pitch angle, calculate the rotation angle of each joint; only solves for the data corresponding to the given set of coordinates and pitch angle; returns False if no solution is found;
+
+`armMoveIK.py`: Imports inverseKinematics, solves within the pitch angle range, and returns either the endpoint of the interval or reference data within the interval; returns False if no solution is found.
+
+### Web control
+
+This code is used for controlling motors from a web page, accessible from both PCs and mobile devices. You can simply run `main.py` of this project and then open http://127.0.0.1:5001 or http://10.10.60.204:5001 to use the control panel.
 
 ## Hardware modules involved
 
@@ -38,6 +50,10 @@ Install python requirements:
 ```bash
 pip install -r requirements.txt
 ```
+
+> [!NOTE]
+>
+> The code used for debugging in this project is implemented by default using the PCAN module. If you are using the ESP32 module, please note that you will need to use a CAN conversion module (such as SN65HVD230) and pay attention to the hardware connections.
 
 ### ESP32
 
@@ -74,8 +90,6 @@ Paste the code from `tools.py` into the editor window. Click File â†’ Save as â†
 > [!NOTE]
 >
 > If you need to enable automatic startup, save it as `main.py`.
-
-
 
 
 
