@@ -34,7 +34,9 @@ def init_motors():
         # 创建电机控制器 (使用CANopen协议节点ID)
         motor1 = CANMotorController(bus, motor_id=101, main_can_id=254)
         motor2 = CANMotorController(bus, motor_id=102, main_can_id=254)
-        motors = [motor1, motor2]
+        motor3 = CANMotorController(bus, motor_id=103, main_can_id=254)
+        motor4 = CANMotorController(bus, motor_id=104, main_can_id=254)
+        motors = [motor1, motor2, motor3, motor4]
         logging.info("电机控制器初始化完成")
 
         # 配置电机参数（符合CANopen SDO参数配置规范）
@@ -68,19 +70,30 @@ def main():
 
         # 位置控制序列：逆时针→顺时针→回零
         logging.info("开始逆时针运动")
-        for motor in motors:
-            motor.write_single_param("loc_ref", value=-1.5)  # 逆时针方向
-        time.sleep(0.8)
-
-        logging.info("开始顺时针运动")
-        for motor in motors:
-            motor.write_single_param("loc_ref", value=1.5)  # 顺时针方向
-        time.sleep(1.5)
+        for i, motor in enumerate(motors):
+            if i == 2:  # motor3反向
+                motor.write_single_param("loc_ref", value=0.2)
+            else:
+                motor.write_single_param("loc_ref", value=-0.2)
+            time.sleep(2)
 
         logging.info("回到零点位置")
         for motor in motors:
             motor.write_single_param("loc_ref", value=0)  # 回零
-        time.sleep(0.8)
+            time.sleep(2)
+
+        logging.info("开始顺时针运动")
+        for i, motor in enumerate(motors):
+            if i == 2:  # motor3反向
+                motor.write_single_param("loc_ref", value=-0.2)
+            else:
+                motor.write_single_param("loc_ref", value=0.2)
+            time.sleep(2)
+
+        logging.info("回到零点位置")
+        for motor in motors:
+            motor.write_single_param("loc_ref", value=0)  # 回零
+            time.sleep(2)
 
         # 关闭电机
         for motor in motors:

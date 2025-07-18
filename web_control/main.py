@@ -48,8 +48,10 @@ def init_motors():  # 初始化CAN总线和电机控制器
 
         # 创建电机控制器
         motor1 = CANMotorController(bus, motor_id=101, main_can_id=254)
-        motor2 = CANMotorController(bus, motor_id=127, main_can_id=254)
-        motors = [motor1, motor2]
+        motor2 = CANMotorController(bus, motor_id=102, main_can_id=254)
+        motor3 = CANMotorController(bus, motor_id=103, main_can_id=254)
+        motor4 = CANMotorController(bus, motor_id=104, main_can_id=254)
+        motors = [motor1, motor2, motor3, motor4]
         logging.info("电机控制器初始化完成")
 
         # 配置电机参数
@@ -58,7 +60,7 @@ def init_motors():  # 初始化CAN总线和电机控制器
             motor.write_param_table("loc_kp", 8)  # 位置环比例增益
             motor.write_param_table("spd_kp", 2)  # 速度环比例增益
             motor.write_param_table("spd_ki", 0.03)  # 速度环积分增益
-            motor.write_single_param("limit_spd", value=4)  # 最大速度限制
+            motor.write_single_param("limit_spd", value=2)  # 最大速度限制
             motor.disable()  # 进入SWITCH_ON_DISABLED状态
             motor.set_0_pos()  # 设置机械零点
         logging.info("电机参数配置完成并设置零点")
@@ -117,12 +119,18 @@ def handle_forward():
     with lock:
         logging.info("开始顺时针运动")
         if mode_flag == 1:
-            for motor in motors:
-                motor.write_single_param("loc_ref", value=2)  # 顺时针方向
+            for i, motor in enumerate(motors):
+                if i == 2:  # motor3反向
+                    motor.write_single_param("loc_ref", value=-0.2)
+                else:
+                    motor.write_single_param("loc_ref", value=0.2)
             time.sleep(0.5)
         elif mode_flag == 2:
-            for motor in motors:
-                motor.write_single_param("spd_ref", value=3)
+            for i, motor in enumerate(motors):
+                if i == 2:  # motor3反向
+                    motor.write_single_param("spd_ref", value=-0.2)
+                else:
+                    motor.write_single_param("spd_ref", value=0.2)
 
 @socketio.on('backward')
 def handle_backward():
@@ -132,12 +140,18 @@ def handle_backward():
     with lock:
         logging.info("开始逆时针运动")
         if mode_flag == 1:
-            for motor in motors:
-                motor.write_single_param("loc_ref", value=-2)  # 逆时针方向
+            for i, motor in enumerate(motors):
+                if i == 2:  # motor3反向
+                    motor.write_single_param("loc_ref", value=0.2)
+                else:
+                    motor.write_single_param("loc_ref", value=-0.2)
             time.sleep(0.5)
         elif mode_flag == 2:
-            for motor in motors:
-                motor.write_single_param("spd_ref", value=-3)
+            for i, motor in enumerate(motors):
+                if i == 2:  # motor3反向
+                    motor.write_single_param("spd_ref", value=0.2)
+                else:
+                    motor.write_single_param("spd_ref", value=-0.2)
 
 @socketio.on('zero')
 def handle_zero():
