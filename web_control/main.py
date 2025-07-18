@@ -123,14 +123,14 @@ def handle_forward():
                 if i == 2:  # motor3反向
                     motor.write_single_param("loc_ref", value=-0.2)
                 else:
-                    motor.write_single_param("loc_ref", value=0.2)
+                    motor.write_single_param("loc_ref", value=0.2)  # 顺时针方向
             time.sleep(0.5)
         elif mode_flag == 2:
             for i, motor in enumerate(motors):
                 if i == 2:  # motor3反向
                     motor.write_single_param("spd_ref", value=-0.2)
                 else:
-                    motor.write_single_param("spd_ref", value=0.2)
+                    motor.write_single_param("spd_ref", value=0.2)  # 逆时针方向
 
 @socketio.on('backward')
 def handle_backward():

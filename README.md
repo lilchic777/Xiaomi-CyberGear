@@ -15,7 +15,7 @@ for the open-source code.
 
 `pcan-robotic-1axis.py`: Debugging program for a single micro motor;
 
-`pcan-robotic-2axis.py`: Debugging program for two micro motors simultaneously, which can be extended to control multiple axes simultaneously arm;
+`pcan-robotic-multiaxes.py`: Debugging program for four micro motors simultaneously.
 
 > [!NOTE]
 >
