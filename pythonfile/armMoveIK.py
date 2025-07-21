@@ -8,10 +8,8 @@ import os
 import sys
 import time
 import can
-import math
 import numpy as np
 from inverseKinematics import IK
-# import matplotlib.pyplot as plt
 
 # 添加pcan_cybergear库的路径
 sys.path.append(os.path.join("..", "cybergear"))
@@ -37,16 +35,18 @@ def init_motors():
         # 创建电机控制器 (使用CANopen协议节点ID)
         motor1 = CANMotorController(bus, motor_id=101, main_can_id=254)
         motor2 = CANMotorController(bus, motor_id=102, main_can_id=254)
-        motors = [motor1, motor2]
+        motor3 = CANMotorController(bus, motor_id=103, main_can_id=254)
+        motor4 = CANMotorController(bus, motor_id=104, main_can_id=254)
+        motors = [motor1, motor2,motor3, motor4]
         logging.info("电机控制器初始化完成")
 
         # 配置电机参数（符合CANopen SDO参数配置规范）
         for motor in motors:
-            motor.write_param_table("limit_cur", 0.5)  # 电流限制
+            motor.write_param_table("limit_cur", 3)  # 电流限制
             motor.write_param_table("loc_kp", 8)  # 位置环比例增益
             motor.write_param_table("spd_kp", 2)  # 速度环比例增益
             motor.write_param_table("spd_ki", 0.03)  # 速度环积分增益
-            motor.write_single_param("limit_spd", value=4)  # 最大速度限制
+            motor.write_single_param("limit_spd", value=0.5)  # 最大速度限制
             motor.disable()  # 进入SWITCH_ON_DISABLED状态
             motor.set_0_pos()  # 设置机械零点
         logging.info("电机参数配置完成并设置零点")
@@ -72,7 +72,7 @@ class ArmIK:
         # 驱动1234号电机转动，如果没有指定运动时间，自动计算最长时间
         time.sleep(0.02)
         if movetime is None:
-            movetime = int(max(angles[0:2]))  # 切片，包含angle[0]和[1]
+            movetime = int(max(angles[0:4]))  # 切片，包含angle[0]到[3]
 
         for i, motor in enumerate(self.motors):
             motor.write_single_param("loc_ref", angles[i])
@@ -95,9 +95,11 @@ class ArmIK:
             if result:
                 # 转换为Python原生类型
                 theta1 = round(float(np.radians(result['theta1'])), 4)
-                theta2 = round(float(np.radians(result['theta2'])), 4)
+                theta2 = round(float(1.5708- np.radians(result['theta2'])), 4)  # motor2实际旋转角度是90-原角度（因为初始状态为竖直向上）
+                theta3 = - round(float(np.radians(result['theta3'])), 4)    # motor3反向
+                theta4 = round(float(np.radians(result['theta4'])), 4)
                 angles = [
-                    theta1,theta2
+                    theta1,theta2,theta3,theta4
                 ]
                 logging.info('angles: %s', angles)  # 使用%格式符
                 logging.info('alpha: %s', alpha)  # 自动类型转换
@@ -129,25 +131,6 @@ class ArmIK:
             movetime = self.motorsMove(angles, movetime)
         return angles, alpha, movetime
 
-    # def drawMoveRange2D(self, x_min, x_max, dx, y_min, y_max, dy, z, a_min, a_max, da):
-    #     # 测试可到达点, 以2d图形式展现，z固定
-    #     #测试可到达点, 以3d图形式展现，如果点过多，3d图会比较难旋转
-    #     try:
-    #         for y in np.arange(y_min, y_max, dy):
-    #             for x in np.arange(x_min, x_max, dx):
-    #                 result = self.setPitchRange((x, y, z), a_min, a_max, da)
-    #                 if result:
-    #                     plt.scatter(x, y, s=np.pi, c='r')
-    #
-    #         plt.xlabel('X Label')
-    #         plt.ylabel('Y Label')
-    #
-    #         plt.show()
-    #     except Exception as e:
-    #         print(e)
-    #         pass
-
-
 def main():
     # 初始化日志系统
     logging.basicConfig(
@@ -160,7 +143,10 @@ def main():
         AK = ArmIK()
         angles, alpha, movetime = AK.setPitchRangeMoving((0, 33.775, 33.2),20, 60,1)
         AK.motorsMove(angles, movetime)
-
+        time.sleep(5)
+        angles, alpha, movetime = AK.setPitchRangeMoving((0, 0, ik.l1 + ik.l2 + ik.l3 + ik.l4),90, 85,95)
+        AK.motorsMove(angles, movetime)
+        time.sleep(5)
         # 关闭电机
         for motor in AK.motors:
             motor.disable()

@@ -11,7 +11,7 @@ import can
 import threading
 
 # 添加pcan_cybergear库的路径
-sys.path.append(os.path.join("..", "..","cybergear"))
+sys.path.append(os.path.join("..","cybergear"))
 from pcan_cybergear import CANMotorController
 
 # 全局状态
@@ -56,11 +56,11 @@ def init_motors():  # 初始化CAN总线和电机控制器
 
         # 配置电机参数
         for motor in motors:
-            motor.write_param_table("limit_cur", 0.5)  # 电流限制
+            motor.write_param_table("limit_cur", 3)  # 电流限制
             motor.write_param_table("loc_kp", 8)  # 位置环比例增益
             motor.write_param_table("spd_kp", 2)  # 速度环比例增益
             motor.write_param_table("spd_ki", 0.03)  # 速度环积分增益
-            motor.write_single_param("limit_spd", value=2)  # 最大速度限制
+            motor.write_single_param("limit_spd", value=0.5)  # 最大速度限制
             motor.disable()  # 进入SWITCH_ON_DISABLED状态
             motor.set_0_pos()  # 设置机械零点
         logging.info("电机参数配置完成并设置零点")
@@ -124,7 +124,7 @@ def handle_forward():
                     motor.write_single_param("loc_ref", value=-0.2)
                 else:
                     motor.write_single_param("loc_ref", value=0.2)  # 顺时针方向
-            time.sleep(0.5)
+            time.sleep(1)
         elif mode_flag == 2:
             for i, motor in enumerate(motors):
                 if i == 2:  # motor3反向
@@ -145,7 +145,7 @@ def handle_backward():
                     motor.write_single_param("loc_ref", value=0.2)
                 else:
                     motor.write_single_param("loc_ref", value=-0.2)
-            time.sleep(0.5)
+            time.sleep(1)
         elif mode_flag == 2:
             for i, motor in enumerate(motors):
                 if i == 2:  # motor3反向
@@ -163,7 +163,7 @@ def handle_zero():
             logging.info("回到零点位置")
             for motor in motors:
                 motor.write_single_param("loc_ref", value=0)  # 回零
-            time.sleep(0.5)
+            time.sleep(1)
         elif mode_flag == 2:
             logging.info("速度回零")
             for motor in motors:
