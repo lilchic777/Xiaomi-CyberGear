@@ -41,11 +41,11 @@ def init_motors():
 
         # 配置电机参数（符合CANopen SDO参数配置规范）
         for motor in motors:
-            motor.write_param_table("limit_cur", 0.5)  # 电流限制
+            motor.write_param_table("limit_cur", 3)  # 电流限制
             motor.write_param_table("loc_kp", 8)  # 位置环比例增益
             motor.write_param_table("spd_kp", 2)  # 速度环比例增益
             motor.write_param_table("spd_ki", 0.03)  # 速度环积分增益
-            motor.write_single_param("limit_spd", value=4)  # 最大速度限制
+            motor.write_single_param("limit_spd", value=0.5)  # 最大速度限制
             motor.disable()  # 进入SWITCH_ON_DISABLED状态
             motor.set_0_pos()  # 设置机械零点
         logging.info("电机参数配置完成并设置零点")
