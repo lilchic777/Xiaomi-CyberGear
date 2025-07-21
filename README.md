@@ -29,7 +29,37 @@ for the open-source code.
 
 ### Web control
 
-This code is used for controlling motors from a web page, accessible from both PCs and mobile devices. You can simply run `main.py` of this project and then open http://127.0.0.1:5001 or http://10.10.60.204:5001 to use the control panel.
+This code is used for controlling motors from a web page, accessible from both PCs and mobile devices. You can simply run `main.py` of this project and then open http://127.0.0.1:5001 or http://10.10.60.133:5001 to use the control panel.
+
+### 4-axis teach
+
+`pcan-robotic-4axis-teach.ipynb`: This code is a Jupyter Notebook script used to implement teaching and playback functions for the joints of a quadcopter robot.
+
+> [!NOTE]
+>
+> Since this code needs to be executed in steps (initialization, gradual recording of the robot arm's pose, and replay of the robot arm's pose), please configure the Jupyter Notebook environment with Jupyter MicroPython Kernel to run it.
+
+Open the cmd terminal and enter the command line to execute the installation:
+
+```bash
+pip install jupyter notebook
+pip install jupyter_micropython_kernel
+python -m jupyter_micropython_kernel.install
+```
+
+You can run the following command to verify that the installation was successful:
+
+```bash
+jupyter kernelspec list
+```
+
+Open the cmd terminal and enter the command line to open Jupyter Notebook:
+
+```bash
+jupyter notebook
+```
+
+Then open `pcan-robotic-4axis-teach.ipynb` in your browser. Note that the `notebook` folder should be parallel to the `cybergear` folder.
 
 ## Hardware modules involved
 
